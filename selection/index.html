@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Selection - SudokuMaster</title>
+    <link rel="stylesheet" href="../css/common.css">
+    <style>
+        .selection-container {
+            padding-top: 2rem;
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 15px 15px 0 0;
+        }
+
+        .game-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .game-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+            text-decoration: none;
+        }
+
+        .game-author {
+            color: #667eea;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .game-body {
+            padding: 1.5rem;
+        }
+
+        .game-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .game-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .difficulty-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .difficulty-easy {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .difficulty-medium {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .difficulty-hard {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .difficulty-expert {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .grid-size {
+            font-size: 0.9rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .game-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .stat-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+            text-transform: uppercase;
+        }
+
+        .play-button {
+            width: 100%;
+            padding: 0.8rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+        }
+
+        .play-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .filter-section {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .filter-options {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid #dee2e6;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            border-color: #667eea;
+            background-color: #667eea;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .game-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .game-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: flex-start;
+            }
+            
+            .filter-options {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <a href="../" class="navbar-brand">🧩 SudokuMaster</a>
+        <button class="navbar-toggle" onclick="toggleMobileMenu()">☰</button>
+        <ul class="navbar-nav">
+            <li><a href="../" class="nav-link">Home</a></li>
+            <li><a href="../selection/" class="nav-link active">Games</a></li>
+            <li><a href="../rules/" class="nav-link">Rules</a></li>
+            <li><a href="../highscore/" class="nav-link">High Scores</a></li>
+            <li><a href="../login/" class="nav-link">Login</a></li>
+            <li><a href="../register/" class="nav-link">Register</a></li>
+        </ul>
+    </nav>
+
+    <div class="container selection-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Choose Your Challenge</h1>
+            <p class="page-subtitle">Select from our curated collection of Sudoku puzzles</p>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <h3 class="filter-title">Filter by Difficulty</h3>
+            <div class="filter-options">
+                <button class="filter-btn active">All</button>
+                <button class="filter-btn">Easy</button>
+                <button class="filter-btn">Medium</button>
+                <button class="filter-btn">Hard</button>
+                <button class="filter-btn">Expert</button>
+            </div>
+        </div>
+
+        <!-- Games Grid -->
+        <div class="game-grid">
+            <!-- Easy 6x6 Games -->
+            <div class="game-card" onclick="window.location.href='../easy-game/'">
+                <div class="game-header">
+                    <h2 class="game-title">Morning Warm-up</h2>
+                    <div class="game-author">by Sarah Chen</div>
+                </div>
+                <div class="game-body">
+                    <p class="game-description">
+                        Perfect for beginners! Start your day with this gentle 6x6 puzzle designed 
+                        to ease you into the world of Sudoku without overwhelming complexity.
+                    </p>
+                    <div class="game-meta">
+                        <span class="difficulty-badge difficulty-easy">Easy</span>
+                        <span class="grid-size">6×6 Grid</span>
+                    </div>
+                    <div class="game-stats">
+                        <div class="stat-item">
+                            <span class="stat-value">2-5</span>
+                            <span class="stat-label">Minutes</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">★★☆☆☆</span>
+                            <span class="stat-label">Difficulty</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">1,247</span>
+                            <span class="stat-label">Completed</span>
+                        </div>
+                    </div>
+                    <a href="../easy-game/" class="play-button">Play Now</a>
+                </div>
+            </div>
+
+            <div class="game-card" onclick="window.location.href='../easy-game/'">
+                <div class="game-header">
+                    <h2 class="game-title">Beginner's Delight</h2>
+                    <div class="game-author">by Mike Rodriguez</div>
+                </div>
+                <div class="game-body">
+                    <p class="game-description">
+                        Another friendly 6x6 puzzle that builds confidence. Features a balanced 
+                        layout with just the right amount of given numbers to guide you through.
+                    </p>
+                    <div class="game-meta">
+                        <span class="difficulty-badge difficulty-easy">Easy</span>
+                        <span class="grid-size">6×6 Grid</span>
+                    </div>
+                    <div class="game-stats">
+                        <div class="stat-item">
+                            <span class="stat-value">3-7</span>
+                            <span class="stat-label">Minutes</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">★★☆☆☆</span>
+                            <span class="stat-label">Difficulty</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">892</span>
+                            <span class="stat-label">Completed</span>
+                        </div>
+                    </div>
+                    <a href="../easy-game/" class="play-button">Play Now</a>
+                </div>
+            </div>
+
+            <!-- Medium 9x9 Games -->
+            <div class="game-card" onclick="window.location.href='../hard-game/'">
+                <div class="game-header">
+                    <h2 class="game-title">Classic Challenge</h2>
+                    <div class="game-author">by Dr. Amanda Foster</div>
+                </div>
+                <div class="game-body">
+                    <p class="game-description">
+                        Step up to the traditional 9x9 Sudoku experience. This medium-difficulty 
+                        puzzle offers a perfect balance of logic and challenge for developing players.
+                    </p>
+                    <div class="game-meta">
+                        <span class="difficulty-badge difficulty-medium">Medium</span>
+                        <span class="grid-size">9×9 Grid</span>
+                    </div>
+                    <div class="game-stats">
+                        <div class="stat-item">
+                            <span class="stat-value">8-15</span>
+                            <span class="stat-label">Minutes</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">★★★☆☆</span>
+                            <span class="stat-label">Difficulty</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">2,156</span>
+                            <span class="stat-label">Completed</span>
+                        </div>
+                    </div>
+                    <a href="../hard-game/" class="play-button">Play Now</a>
+                </div>
+            </div>
+
+            <div class="game-card" onclick="window.location.href='../hard-game/'">
+                <div class="game-header">
+                    <h2 class="game-title">Lunch Break Puzzle</h2>
+                    <div class="game-author">by James Liu</div>
+                </div>
+                <div class="game-body">
+                    <p class="game-description">
+                        Perfect for a quick mental break! This medium-level 9x9 puzzle is designed 
+                        to be completed in about 10-12 minutes with focused concentration.
+                    </p>
+                    <div class="game-meta">
+                        <span class="difficulty-badge difficulty-medium">Medium</span>
+                        <span class="grid-size">9×9 Grid</span>
+                    </div>
+                    <div class="game-stats">
+                        <div class="stat-item">
+                            <span class="stat-value">10-12</span>
+                            <span class="stat-label">Minutes</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">★★★☆☆</span>
+                            <span class="stat-label">Difficulty</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">1,834</span>
+                            <span class="stat-label">Completed</span>
+                        </div>
+                    </div>
+                    <a href="../hard-game/" class="play-button">Play Now</a>
+                </div>
+            </div>
+
+            <!-- Hard 9x9 Games -->
+            <div class="game-card" onclick="window.location.href='../hard-game/'">
+                <div class="game-header">
+                    <h2 class="game-title">Mind Bender</h2>
+                    <div class="game-author">by Prof. Elena Vasquez</div>
+                </div>
+                <div class="game-body">
+                    <p class="game-description">
+                        Ready for a real challenge? This hard-level puzzle will test your advanced 
+                        solving techniques and patience. Only for experienced Sudoku enthusiasts!
+                    </p>
+                    <div class="game-meta">
+                        <span class="difficulty-badge difficulty-hard">Hard</span>
+                        <span class="grid-size">9×9 Grid</span>
+                    </div>
+                    <div class="game-stats">
+                        <div class="stat-item">
+                            <span class="stat-value">15-25</span>
+                            <span class="stat-label">Minutes</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">★★★★☆</span>
+                            <span class="stat-label">Difficulty</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">743</span>
+                            <span class="stat-label">Completed</span>
+                        </div>
+                    </div>
+                    <a href="../hard-game/" class="play-button">Play Now</a>
+                </div>
+            </div>
+
+            <div class="game-card" onclick="window.location.href='../hard-game/'">
+                <div class="game-header">
+                    <h2 class="game-title">Expert's Choice</h2>
+                    <div class="game-author">by Kenji Tanaka</div>
+                </div>
+                <div class="game-body">
+                    <p class="game-description">
+                        The ultimate test of Sudoku mastery. This expert-level puzzle requires 
+                        advanced techniques and deep logical thinking. Are you up for the challenge?
+                    </p>
+                    <div class="game-meta">
+                        <span class="difficulty-badge difficulty-expert">Expert</span>
+                        <span class="grid-size">9×9 Grid</span>
+                    </div>
+                    <div class="game-stats">
+                        <div class="stat-item">
+                            <span class="stat-value">20-40</span>
+                            <span class="stat-label">Minutes</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">★★★★★</span>
+                            <span class="stat-label">Difficulty</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">312</span>
+                            <span class="stat-label">Completed</span>
+                        </div>
+                    </div>
+                    <a href="../hard-game/" class="play-button">Play Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleMobileMenu() {
+            const nav = document.querySelector('.navbar-nav');
+            nav.classList.toggle('active');
+        }
+
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Filter functionality
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+

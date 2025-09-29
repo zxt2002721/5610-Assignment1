@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Rules - SudokuMaster</title>
+    <link rel="stylesheet" href="../css/common.css">
+    <style>
+        .rules-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .rules-section {
+            background: white;
+            border-radius: 15px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .rules-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 15px 15px 0 0;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .rule-item {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .rule-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.8rem;
+        }
+
+        .rule-description {
+            color: #666;
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .example-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 2px;
+            background-color: #333;
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 2px;
+            max-width: 200px;
+            margin: 1rem auto;
+            aspect-ratio: 1;
+        }
+
+        .example-cell {
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .example-cell.highlight {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .example-cell.error {
+            background-color: #ffebee;
+            color: #d32f2f;
+        }
+
+        .example-cell.correct {
+            background-color: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .difficulty-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .difficulty-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .difficulty-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .difficulty-card.easy {
+            border-top: 4px solid #28a745;
+        }
+
+        .difficulty-card.hard {
+            border-top: 4px solid #dc3545;
+        }
+
+        .difficulty-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .difficulty-card.easy .difficulty-title {
+            color: #28a745;
+        }
+
+        .difficulty-card.hard .difficulty-title {
+            color: #dc3545;
+        }
+
+        .tips-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .tips-list li {
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #eee;
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .tips-list li::before {
+            content: '💡';
+            position: absolute;
+            left: 0;
+            top: 0.8rem;
+        }
+
+        .tips-list li:last-child {
+            border-bottom: none;
+        }
+
+        .strategies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .strategy-card {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            border-left: 4px solid #764ba2;
+        }
+
+        .strategy-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.8rem;
+        }
+
+        .credits-section {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-align: center;
+        }
+
+        .credits-section::before {
+            background: linear-gradient(90deg, rgba(255,255,255,0.3), rgba(255,255,255,0.1));
+        }
+
+        .credits-title {
+            color: white;
+            margin-bottom: 2rem;
+        }
+
+        .credits-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .credit-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .credit-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .credit-role {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 1rem;
+        }
+
+        .contact-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .contact-link {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .contact-link:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .rules-container {
+                padding: 1rem;
+            }
+            
+            .rules-section {
+                padding: 1.5rem;
+            }
+            
+            .section-title {
+                font-size: 1.5rem;
+            }
+            
+            .difficulty-comparison {
+                grid-template-columns: 1fr;
+            }
+            
+            .strategies-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .contact-links {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <a href="../" class="navbar-brand">🧩 SudokuMaster</a>
+        <button class="navbar-toggle" onclick="toggleMobileMenu()">☰</button>
+        <ul class="navbar-nav">
+            <li><a href="../" class="nav-link">Home</a></li>
+            <li><a href="../selection/" class="nav-link">Games</a></li>
+            <li><a href="../rules/" class="nav-link active">Rules</a></li>
+            <li><a href="../highscore/" class="nav-link">High Scores</a></li>
+            <li><a href="../login/" class="nav-link">Login</a></li>
+            <li><a href="../register/" class="nav-link">Register</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">How to Play Sudoku</h1>
+            <p class="page-subtitle">Master the art of number puzzles with our comprehensive guide</p>
+        </div>
+
+        <div class="rules-container">
+            <!-- Basic Rules Section -->
+            <section class="rules-section">
+                <h2 class="section-title">Basic Rules</h2>
+                
+                <div class="rule-item">
+                    <h3 class="rule-title">🎯 The Objective</h3>
+                    <p class="rule-description">
+                        Fill the entire grid with numbers so that each row, column, and sub-grid contains 
+                        all the numbers from 1 to the grid size exactly once. No number should be repeated 
+                        in any row, column, or sub-grid.
+                    </p>
+                </div>
+
+                <div class="rule-item">
+                    <h4 class="rule-title">📐 Grid Structure</h4>
+                    <p class="rule-description">
+                        Sudoku puzzles come in different sizes. In our game, you'll find:
+                    </p>
+                    <ul style="margin-left: 1rem; color: #666;">
+                        <li><strong>6×6 Grid (Easy):</strong> Uses numbers 1-6, divided into 2×3 sub-grids</li>
+                        <li><strong>9×9 Grid (Hard):</strong> Uses numbers 1-9, divided into 3×3 sub-grids</li>
+                    </ul>
+                    
+                    <div style="text-align: center; margin: 1rem 0;">
+                        <p style="font-size: 0.9rem; color: #666; margin-bottom: 0.5rem;">Example 6×6 Grid:</p>
+                        <div class="example-grid">
+                            <div class="example-cell correct">3</div>
+                            <div class="example-cell">4</div>
+                            <div class="example-cell highlight">6</div>
+                            <div class="example-cell">2</div>
+                            <div class="example-cell">5</div>
+                            <div class="example-cell correct">1</div>
+                            <div class="example-cell">1</div>
+                            <div class="example-cell correct">5</div>
+                            <div class="example-cell">2</div>
+                            <div class="example-cell highlight">3</div>
+                            <div class="example-cell">6</div>
+                            <div class="example-cell">4</div>
+                            <div class="example-cell correct">6</div>
+                            <div class="example-cell">3</div>
+                            <div class="example-cell">1</div>
+                            <div class="example-cell">5</div>
+                            <div class="example-cell highlight">4</div>
+                            <div class="example-cell">2</div>
+                            <div class="example-cell">5</div>
+                            <div class="example-cell correct">2</div>
+                            <div class="example-cell">4</div>
+                            <div class="example-cell">1</div>
+                            <div class="example-cell">3</div>
+                            <div class="example-cell highlight">6</div>
+                            <div class="example-cell">4</div>
+                            <div class="example-cell">1</div>
+                            <div class="example-cell correct">3</div>
+                            <div class="example-cell">6</div>
+                            <div class="example-cell highlight">2</div>
+                            <div class="example-cell">5</div>
+                            <div class="example-cell correct">2</div>
+                            <div class="example-cell">6</div>
+                            <div class="example-cell">5</div>
+                            <div class="example-cell highlight">4</div>
+                            <div class="example-cell">1</div>
+                            <div class="example-cell correct">3</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rule-item">
+                    <h5 class="rule-title">🚫 What's Not Allowed</h5>
+                    <p class="rule-description">
+                        You cannot place the same number twice in any:
+                    </p>
+                    <ol style="margin-left: 1rem; color: #666;">
+                        <li>Row (horizontal line)</li>
+                        <li>Column (vertical line)</li>
+                        <li>Sub-grid (the smaller rectangular sections)</li>
+                    </ol>
+                </div>
+            </section>
+
+            <!-- Difficulty Levels Section -->
+            <section class="rules-section">
+                <h2 class="section-title">Difficulty Levels</h2>
+                
+                <div class="difficulty-comparison">
+                    <div class="difficulty-card easy">
+                        <h3 class="difficulty-title">Easy (6×6)</h3>
+                        <p><strong>Grid Size:</strong> 6 rows × 6 columns</p>
+                        <p><strong>Numbers Used:</strong> 1, 2, 3, 4, 5, 6</p>
+                        <p><strong>Sub-grids:</strong> 2×3 rectangles</p>
+                        <p><strong>Typical Time:</strong> 3-7 minutes</p>
+                        <p><strong>Perfect for:</strong> Beginners and quick games</p>
+                    </div>
+                    
+                    <div class="difficulty-card hard">
+                        <h3 class="difficulty-title">Hard (9×9)</h3>
+                        <p><strong>Grid Size:</strong> 9 rows × 9 columns</p>
+                        <p><strong>Numbers Used:</strong> 1, 2, 3, 4, 5, 6, 7, 8, 9</p>
+                        <p><strong>Sub-grids:</strong> 3×3 squares</p>
+                        <p><strong>Typical Time:</strong> 15-40 minutes</p>
+                        <p><strong>Perfect for:</strong> Experienced players</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Strategies Section -->
+            <section class="rules-section">
+                <h2 class="section-title">Solving Strategies</h2>
+                
+                <div class="strategies-grid">
+                    <div class="strategy-card">
+                        <h3 class="strategy-title">🔍 Scanning</h3>
+                        <p>Look for rows, columns, or sub-grids that are nearly complete. Often you can immediately see what number is missing.</p>
+                    </div>
+                    
+                    <div class="strategy-card">
+                        <h3 class="strategy-title">📝 Process of Elimination</h3>
+                        <p>For each empty cell, determine which numbers are already used in its row, column, and sub-grid. The remaining numbers are possibilities.</p>
+                    </div>
+                    
+                    <div class="strategy-card">
+                        <h3 class="strategy-title">🎯 Single Possibility</h3>
+                        <p>If a cell has only one possible number based on the elimination process, that's the answer for that cell.</p>
+                    </div>
+                    
+                    <div class="strategy-card">
+                        <h3 class="strategy-title">🔢 Hidden Singles</h3>
+                        <p>Sometimes a number can only go in one place within a row, column, or sub-grid, even if that cell has other possibilities.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tips Section -->
+            <section class="rules-section">
+                <h2 class="section-title">Pro Tips</h2>
+                
+                <ul class="tips-list">
+                    <li>Start with the easiest cells first - look for rows, columns, or sub-grids with the most numbers already filled in.</li>
+                    <li>Use pencil marks (or mental notes) to keep track of possible numbers for each cell.</li>
+                    <li>Don't guess! Every move should be based on logical deduction.</li>
+                    <li>Take breaks if you get stuck. Sometimes a fresh perspective helps you see new possibilities.</li>
+                    <li>Practice regularly with easier puzzles before moving to harder ones.</li>
+                    <li>Double-check your work frequently to catch mistakes early.</li>
+                </ul>
+            </section>
+
+            <!-- Credits Section -->
+            <section class="rules-section credits-section">
+                <h2 class="credits-title">Made By</h2>
+                
+                <div class="credits-content">
+                    <div class="credit-item">
+                        <div class="credit-name">Junkai Chen</div>
+                    </div>
+                    
+                    <div class="credit-item">
+                        <div class="credit-name">Xiaotian Zhang</div>
+                    </div>
+                </div>
+                
+                <div class="contact-links">
+                    <a href="https://github.com/zxt2002721/5610-Assignment1" class="contact-link">🐙 GitHub Repository</a>
+                </div>
+                
+                <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.2);">
+                    <p>&copy; 2024 SudokuMaster. Created with ❤️ for puzzle enthusiasts worldwide.</p>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        function toggleMobileMenu() {
+            const nav = document.querySelector('.navbar-nav');
+            nav.classList.toggle('active');
+        }
+
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Add smooth scrolling for better UX
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+

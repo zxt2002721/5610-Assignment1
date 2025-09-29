@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>High Scores - SudokuMaster</title>
+    <link rel="stylesheet" href="../css/common.css">
+    <style>
+        .highscore-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .leaderboard-section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .leaderboard-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ffd700, #ffb347);
+            border-radius: 15px 15px 0 0;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .filter-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            padding: 0.8rem 1.5rem;
+            border: 2px solid #dee2e6;
+            background: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            text-decoration: none;
+            color: #666;
+        }
+
+        .filter-tab:hover,
+        .filter-tab.active {
+            border-color: #667eea;
+            background-color: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .leaderboard-table th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        .leaderboard-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: middle;
+        }
+
+        .leaderboard-table tr:hover {
+            background-color: #f8f9ff;
+        }
+
+        .rank-cell {
+            font-weight: 700;
+            font-size: 1.1rem;
+            width: 80px;
+            text-align: center;
+        }
+
+        .rank-1 {
+            color: #ffd700;
+            font-size: 1.3rem;
+        }
+
+        .rank-2 {
+            color: #c0c0c0;
+            font-size: 1.2rem;
+        }
+
+        .rank-3 {
+            color: #cd7f32;
+            font-size: 1.2rem;
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .player-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .player-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .player-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.2rem;
+        }
+
+        .player-level {
+            font-size: 0.8rem;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .score-cell {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 1.1rem;
+        }
+
+        .time-cell {
+            color: #666;
+            font-family: 'Courier New', monospace;
+        }
+
+        .difficulty-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-easy {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .badge-medium {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-hard {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-expert {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .recent-achievements {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .recent-achievements::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.3), rgba(255,255,255,0.1));
+            border-radius: 15px 15px 0 0;
+        }
+
+        .achievement-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .achievement-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .achievement-icon {
+            font-size: 2rem;
+            width: 50px;
+            text-align: center;
+        }
+
+        .achievement-text {
+            flex: 1;
+        }
+
+        .achievement-title {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .achievement-description {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .crown-icon {
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .highscore-container {
+                padding: 1rem;
+            }
+            
+            .leaderboard-section {
+                padding: 1.5rem;
+            }
+            
+            .section-title {
+                font-size: 1.5rem;
+            }
+            
+            .filter-tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .filter-tab {
+                width: 100%;
+                max-width: 200px;
+                text-align: center;
+            }
+            
+            .leaderboard-table {
+                font-size: 0.9rem;
+            }
+            
+            .leaderboard-table th,
+            .leaderboard-table td {
+                padding: 0.8rem 0.5rem;
+            }
+            
+            .player-info {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.5rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .leaderboard-table {
+                font-size: 0.8rem;
+            }
+            
+            .player-avatar {
+                width: 30px;
+                height: 30px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <a href="../" class="navbar-brand">🧩 SudokuMaster</a>
+        <button class="navbar-toggle" onclick="toggleMobileMenu()">☰</button>
+        <ul class="navbar-nav">
+            <li><a href="../" class="nav-link">Home</a></li>
+            <li><a href="../selection/" class="nav-link">Games</a></li>
+            <li><a href="../rules/" class="nav-link">Rules</a></li>
+            <li><a href="../highscore/" class="nav-link active">High Scores</a></li>
+            <li><a href="../login/" class="nav-link">Login</a></li>
+            <li><a href="../register/" class="nav-link">Register</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">🏆 High Scores Leaderboard</h1>
+            <p class="page-subtitle">See how you stack up against the best Sudoku solvers</p>
+        </div>
+
+        <div class="highscore-container">
+            <!-- Statistics Overview -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">12,847</div>
+                    <div class="stat-label">Total Games Played</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">2,156</div>
+                    <div class="stat-label">Active Players</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">8:42</div>
+                    <div class="stat-label">Average Solve Time</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">94.2%</div>
+                    <div class="stat-label">Completion Rate</div>
+                </div>
+            </div>
+
+            <!-- Main Leaderboard -->
+            <section class="leaderboard-section">
+                <h2 class="section-title">Global Leaderboard</h2>
+                
+                <div class="filter-tabs">
+                    <button class="filter-tab active">All Time</button>
+                    <button class="filter-tab">This Month</button>
+                    <button class="filter-tab">This Week</button>
+                    <button class="filter-tab">Easy Puzzles</button>
+                    <button class="filter-tab">Hard Puzzles</button>
+                </div>
+
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Player</th>
+                            <th>Puzzles Solved</th>
+                            <th>Best Time</th>
+                            <th>Difficulty</th>
+                            <th>Total Points</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="rank-cell rank-1">
+                                <span class="crown-icon">👑</span>1
+                            </td>
+                            <td>
+                                <div class="player-info">
+                                    <div class="player-avatar">SP</div>
+                                    <div class="player-details">
+                                        <div class="player-name">SudokuPro2024</div>
+                                        <div class="player-level">Grandmaster</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="score-cell">1,247</td>
+                            <td class="time-cell">02:14</td>
+                            <td><span class="difficulty-badge badge-expert">Expert</span></td>
+                            <td class="score-cell">156,890</td>
+                        </tr>
+                        
+                        <tr>
+                            <td class="rank-cell rank-2">🥈 2</td>
+                            <td>
+                                <div class="player-info">
+                                    <div class="player-avatar">NM</div>
+                                    <div class="player-details">
+                                        <div class="player-name">NumberMaster</div>
+                                        <div class="player-level">Expert</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="score-cell">1,156</td>
+                            <td class="time-cell">02:31</td>
+                            <td><span class="difficulty-badge badge-hard">Hard</span></td>
+                            <td class="score-cell">142,350</td>
+                        </tr>
+                        
+                        <tr>
+                            <td class="rank-cell rank-3">🥉 3</td>
+                            <td>
+                                <div class="player-info">
+                                    <div class="player-avatar">LQ</div>
+                                    <div class="player-details">
+                                        <div class="player-name">LogicQueen</div>
+                                        <div class="player-level">Expert</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="score-cell">1,089</td>
+                            <td class="time-cell">02:47</td>
+                            <td><span class="difficulty-badge badge-hard">Hard</span></td>
+                            <td class="score-cell">138,720</td>
+                        </tr>
+                        
+                        <tr>
+                            <td class="rank-cell">4</td>
+                            <td>
+                                <div class="player-info">
+                                    <div class="player-avatar">PW</div>
+                                    <div class="player-details">
+                                        <div class="player-name">PuzzleWizard</div>
+                                        <div class="player-level">Advanced</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="score-cell">967</td>
+                            <td class="time-cell">03:12</td>
+                            <td><span class="difficulty-badge badge-hard">Hard</span></td>
+                            <td class="score-cell">124,560</td>
+                        </tr>
+                        
+                        <tr>
+                            <td class="rank-cell">5</td>
+                            <td>
+                                <div class="player-info">
+                                    <div class="player-avatar">SG</div>
+                                    <div class="player-details">
+                                        <div class="player-name">SudokuGuru</div>
+                                        <div class="player-level">Advanced</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="score-cell">892</td>
+                            <td class="time-cell">03:28</td>
+                            <td><span class="difficulty-badge badge-medium">Medium</span></td>
+                            <td class="score-cell">118,940</td>
+                        </tr>
+                        
+                        <tr>
+                            <td class="rank-cell">6</td>
+                            <td>
+                                <div class="player-info">
+                                    <div class="player-avatar">BT</div>
+                                    <div class="player-details">
+                                        <div class="player-name">BrainTeaser</div>
+                                        <div class="player-level">Advanced</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="score-cell">834</td>
+                            <td class="time-cell">03:45</td>
+                            <td><span class="difficulty-badge badge-medium">Medium</span></td>
+                            <td class="score-cell">112,380</td>
+                        </tr>
+                        
+                        <tr>
+                            <td class="rank-cell">7</td>
+                            <td>
+                                <div class="player-info">
+                                    <div class="player-avatar">NF</div>
+                                    <div class="player-details">
+                                        <div class="player-name">NumberFan</div>
+                                        <div class="player-level">Intermediate</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="score-cell">756</td>
+                            <td class="time-cell">04:12</td>
+                            <td><span class="difficulty-badge badge-medium">Medium</span></td>
+                            <td class="score-cell">98,720</td>
+                        </tr>
+                        
+                        <tr>
+                            <td class="rank-cell">8</td>
+                            <td>
+                                <div class="player-info">
+                                    <div class="player-avatar">QS</div>
+                                    <div class="player-details">
+                                        <div class="player-name">QuickSolver</div>
+                                        <div class="player-level">Intermediate</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="score-cell">689</td>
+                            <td class="time-cell">04:33</td>
+                            <td><span class="difficulty-badge badge-easy">Easy</span></td>
+                            <td class="score-cell">87,560</td>
+                        </tr>
+                        
+                        <tr>
+                            <td class="rank-cell">9</td>
+                            <td>
+                                <div class="player-info">
+                                    <div class="player-avatar">MH</div>
+                                    <div class="player-details">
+                                        <div class="player-name">MathHero</div>
+                                        <div class="player-level">Intermediate</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="score-cell">623</td>
+                            <td class="time-cell">04:58</td>
+                            <td><span class="difficulty-badge badge-easy">Easy</span></td>
+                            <td class="score-cell">79,890</td>
+                        </tr>
+                        
+                        <tr>
+                            <td class="rank-cell">10</td>
+                            <td>
+                                <div class="player-info">
+                                    <div class="player-avatar">PP</div>
+                                    <div class="player-details">
+                                        <div class="player-name">PuzzlePlayer</div>
+                                        <div class="player-level">Beginner</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="score-cell">567</td>
+                            <td class="time-cell">05:24</td>
+                            <td><span class="difficulty-badge badge-easy">Easy</span></td>
+                            <td class="score-cell">72,340</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Recent Achievements -->
+            <section class="recent-achievements">
+                <h2 class="section-title" style="color: white;">🎉 Recent Achievements</h2>
+                
+                <div class="achievement-item">
+                    <div class="achievement-icon">🏆</div>
+                    <div class="achievement-text">
+                        <div class="achievement-title">Speed Demon</div>
+                        <div class="achievement-description">SudokuPro2024 just set a new record with 2:14 solve time!</div>
+                    </div>
+                </div>
+                
+                <div class="achievement-item">
+                    <div class="achievement-icon">🔥</div>
+                    <div class="achievement-text">
+                        <div class="achievement-title">100 Streak</div>
+                        <div class="achievement-description">NumberMaster achieved a 100-puzzle solving streak!</div>
+                    </div>
+                </div>
+                
+                <div class="achievement-item">
+                    <div class="achievement-icon">⭐</div>
+                    <div class="achievement-text">
+                        <div class="achievement-title">Rising Star</div>
+                        <div class="achievement-description">LogicQueen climbed 5 positions in the leaderboard this week!</div>
+                    </div>
+                </div>
+                
+                <div class="achievement-item">
+                    <div class="achievement-icon">🎯</div>
+                    <div class="achievement-text">
+                        <div class="achievement-title">Perfect Score</div>
+                        <div class="achievement-description">PuzzleWizard solved 50 puzzles without a single mistake!</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        function toggleMobileMenu() {
+            const nav = document.querySelector('.navbar-nav');
+            nav.classList.toggle('active');
+        }
+
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Filter tab functionality
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                // In a real app, this would filter the leaderboard data
+                console.log('Filtering by:', this.textContent);
+            });
+        });
+
+        // Add animation to stat cards
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animation = 'fadeInUp 0.6s ease-out';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.stat-card, .achievement-item').forEach(card => {
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>
+
+
+

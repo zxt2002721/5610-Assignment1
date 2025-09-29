@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Easy Sudoku - SudokuMaster</title>
+    <link rel="stylesheet" href="../css/common.css">
+    <style>
+        .game-container {
+            display: flex;
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .game-board-section {
+            flex: 2;
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .game-board-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #28a745, #20c997);
+            border-radius: 15px 15px 0 0;
+        }
+
+        .game-info-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .sudoku-grid-6x6 {
+            width: 100%;
+            max-width: 420px;
+            margin: 0 auto;
+            border: 3px solid #333;
+            border-radius: 12px;
+            border-collapse: collapse;
+            table-layout: fixed;
+            background-color: white;
+            overflow: hidden;
+        }
+
+        .sudoku-grid-6x6 td {
+            border: 1px solid #d0d5d8;
+            width: calc(100% / 6);
+            height: 60px;
+            padding: 0;
+        }
+
+        .sudoku-grid-6x6 tr:first-child td {
+            border-top-width: 3px;
+            border-top-color: #333;
+        }
+
+        .sudoku-grid-6x6 tr:last-child td {
+            border-bottom-width: 3px;
+            border-bottom-color: #333;
+        }
+
+        .sudoku-grid-6x6 tr:nth-child(3) td,
+        .sudoku-grid-6x6 tr:nth-child(5) td {
+            border-bottom-width: 1px;
+            border-bottom-color: #d0d5d8;
+        }
+
+        .sudoku-grid-6x6 tr:nth-child(2) td,
+        .sudoku-grid-6x6 tr:nth-child(4) td {
+            border-bottom-width: 3px;
+            border-bottom-color: #333;
+        }
+
+        .sudoku-grid-6x6 td:first-child {
+            border-left-width: 3px;
+            border-left-color: #333;
+        }
+
+        .sudoku-grid-6x6 td:last-child {
+            border-right-width: 3px;
+            border-right-color: #333;
+        }
+
+        .sudoku-grid-6x6 td:nth-child(3) {
+            border-right-width: 3px;
+            border-right-color: #333;
+        }
+
+        .sudoku-grid-6x6 td:nth-child(4),
+        .sudoku-grid-6x6 td:nth-child(5),
+        .sudoku-grid-6x6 td:nth-child(6) {
+            border-left-width: 1px;
+            border-left-color: #d0d5d8;
+        }
+
+        .sudoku-grid-6x6 input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: white;
+            text-align: center;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #333;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+
+        .sudoku-grid-6x6 input::-webkit-outer-spin-button,
+        .sudoku-grid-6x6 input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .sudoku-grid-6x6 input:hover {
+            background-color: #e8f5e8;
+        }
+
+        .sudoku-grid-6x6 input:focus {
+            outline: none;
+            background-color: #f0fff0;
+            box-shadow: inset 0 0 0 2px rgba(40, 167, 69, 0.4);
+        }
+
+        .sudoku-grid-6x6 input[readonly] {
+            background-color: #f8f9fa;
+            cursor: default;
+        }
+
+        .sudoku-grid-6x6 input[readonly]:hover,
+        .sudoku-grid-6x6 input[readonly]:focus {
+            background-color: #f8f9fa;
+            box-shadow: none;
+        }
+
+        .timer-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .timer-display {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #28a745;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: center;
+            gap: 0.2rem;
+        }
+
+        .timer-segment {
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .timer-colon {
+            animation: blink 1s steps(1, end) infinite;
+        }
+
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+
+        .timer-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .game-info-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .info-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .info-value {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .difficulty-indicator {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background-color: #d4edda;
+            color: #155724;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .game-controls {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .control-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .control-btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            display: block;
+        }
+
+        .btn-success-control {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .btn-success-control:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-secondary-control {
+            background-color: #f8f9fa;
+            color: #333;
+            border: 2px solid #dee2e6;
+        }
+
+        .btn-secondary-control:hover {
+            background-color: #e9ecef;
+            transform: translateY(-1px);
+        }
+
+        .btn-danger-control {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-danger-control:hover {
+            background-color: #c82333;
+            transform: translateY(-1px);
+        }
+
+        .number-pad-6x6 {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .number-grid-6x6 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+        }
+
+        .number-btn-6x6 {
+            padding: 1rem;
+            border: 2px solid #dee2e6;
+            background: white;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .number-btn-6x6:hover {
+            border-color: #28a745;
+            background-color: #f0fff0;
+        }
+
+        .number-btn-6x6.selected,
+        .number-btn-6x6:focus {
+            background-color: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+
+        .progress-section {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-bar {
+            background-color: #e9ecef;
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #28a745, #20c997);
+            height: 100%;
+            width: 42%;
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 1024px) {
+            .game-container {
+                flex-direction: column;
+                padding: 1rem;
+            }
+            
+            .game-info-section {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+            
+            .timer-card,
+            .game-info-card,
+            .game-controls,
+            .number-pad-6x6,
+            .progress-section {
+                flex: 1;
+                min-width: 250px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sudoku-grid-6x6 {
+                max-width: 300px;
+            }
+            
+            .sudoku-cell-6x6 {
+                font-size: 1.2rem;
+            }
+            
+            .game-info-section {
+                flex-direction: column;
+            }
+            
+            .timer-display {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sudoku-grid-6x6 {
+                max-width: 280px;
+            }
+            
+            .sudoku-cell-6x6 {
+                font-size: 1rem;
+            }
+            
+            .game-container {
+                padding: 0.5rem;
+            }
+            
+            .game-board-section,
+            .timer-card,
+            .game-info-card,
+            .game-controls,
+            .number-pad-6x6,
+            .progress-section {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <a href="../" class="navbar-brand">🧩 SudokuMaster</a>
+        <input type="checkbox" id="navToggle" class="navbar-checkbox">
+        <label for="navToggle" class="navbar-toggle">☰</label>
+        <ul class="navbar-nav">
+            <li><a href="../" class="nav-link">Home</a></li>
+            <li><a href="../selection/" class="nav-link">Games</a></li>
+            <li><a href="../rules/" class="nav-link">Rules</a></li>
+            <li><a href="../highscore/" class="nav-link">High Scores</a></li>
+            <li><a href="../login/" class="nav-link">Login</a></li>
+            <li><a href="../register/" class="nav-link">Register</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Easy Sudoku Challenge</h1>
+            <p class="page-subtitle">Perfect for beginners - 6×6 puzzle to get you started</p>
+        </div>
+
+        <div class="game-container">
+            <!-- Game Board Section -->
+            <div class="game-board-section">
+                <h2 style="text-align: center; margin-bottom: 1.5rem; color: #333;">Morning Warm-up</h2>
+                <table class="sudoku-grid-6x6" aria-label="Sudoku grid">
+                    <tbody>
+                        <tr>
+                            <td><input type="tel" inputmode="numeric" maxlength="1" value="3" readonly aria-label="Row 1 Column 1 value 3"></td>
+                            <td><input type="text" inputmode="numeric" pattern="[1-9]" maxlength="1" aria-label="Row 1 Column 2" title="Enter digits 1-9"></td>
+                            <td><input type="tel" inputmode="numeric" maxlength="1" value="6" readonly aria-label="Row 1 Column 3 value 6"></td>
+                            <td><input type="text" inputmode="numeric" pattern="[1-9]" maxlength="1" aria-label="Row 1 Column 4" title="Enter digits 1-9"></td>
+                            <td><input type="text" inputmode="numeric" pattern="[1-9]" maxlength="1" aria-label="Row 1 Column 5" title="Enter digits 1-9"></td>
+                            <td><input type="tel" inputmode="numeric" maxlength="1" value="1" readonly aria-label="Row 1 Column 6 value 1"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" inputmode="numeric" pattern="[1-9]" maxlength="1" aria-label="Row 2 Column 1" title="Enter digits 1-9"></td>
+                            <td><input type="tel" inputmode="numeric" maxlength="1" value="5" readonly aria-label="Row 2 Column 2 value 5"></td>
+                            <td><input type="text" inputmode="numeric" pattern="[1-9]" maxlength="1" aria-label="Row 2 Column 3" title="Enter digits 1-9"></td>
+                            <td><input type="tel" inputmode="numeric" maxlength="1" value="3" readonly aria-label="Row 2 Column 4 value 3"></td>
+                            <td><input type="text" inputmode="numeric" pattern="[1-9]" maxlength="1" aria-label="Row 2 Column 5" title="Enter digits 1-9"></td>
+                            <td><input type="tel" inputmode="numeric" pattern="[1-9]" maxlength="1" aria-label="Row 2 Column 6" title="Enter digits 1-9"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="tel" inputmode="numeric" maxlength="1" value="6" readonly aria-label="Row 3 Column 1 value 6"></td>
+                            <td><input type="text" inputmode="numeric" pattern="[1-9]" maxlength="1" aria-label="Row 3 Column 2" title="Enter digits 1-9"></td>
+                            <td><input type="text" inputmode="numeric" pattern="[1-9]" maxlength="1" aria-label="Row 3 Column 3" title="Enter digits 1-9"></td>
+                            <td><input type="text" inputmode="numeric" pattern="[1-9]" maxlength="1" aria-label="Row 3 Column 4" title="Enter digits 1-9"></td>
+                            <td><input type="tel" inputmode="numeric" maxlength="1" value="4" readonly aria-label="Row 3 Column 5 value 4"></td>
+                            <td><input type="tel" inputmode="numeric" pattern="[1-9]" maxlength="1" aria-label="Row 3 Column 6" title="Enter digits 1-9"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" inputmode="numeric" pattern="[1-9]" maxlength="1" aria-label="Row 4 Column 1" title="Enter digits 1-9"></td>
+                            <td><input type="tel" inputmode="numeric" maxlength="1" value="2" readonly aria-label="Row 4 Column 2 value 2"></td>
+                            <td><input type="text" inputmode="numeric" pattern="[1-9]" maxlength="1" aria-label="Row 4 Column 3" title="Enter digits 1-9"></td>
+                            <td><input type="text" inputmode="numeric" pattern="[1-9]" maxlength="1" aria-label="Row 4 Column 4" title="Enter digits 1-9"></td>
+                            <td><input type="text" inputmode="numeric" pattern="[1-9]" maxlength="1" aria-label="Row 4 Column 5" title="Enter digits 1-9"></td>
+                            <td><input type="tel" inputmode="numeric" maxlength="1" value="3" readonly aria-label="Row 4 Column 6 value 3"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" inputmode="numeric" pattern="[1-9]" maxlength="1" aria-label="Row 5 Column 1" title="Enter digits 1-9"></td>
+                            <td><input type="text" inputmode="numeric" pattern="[1-9]" maxlength="1" aria-label="Row 5 Column 2" title="Enter digits 1-9"></td>
+                            <td><input type="tel" inputmode="numeric" maxlength="1" value="1" readonly aria-label="Row 5 Column 3 value 1"></td>
+                            <td><input type="text" inputmode="numeric" pattern="[1-9]" maxlength="1" aria-label="Row 5 Column 4" title="Enter digits 1-9"></td>
+                            <td><input type="tel" inputmode="numeric" maxlength="1" value="6" readonly aria-label="Row 5 Column 5 value 6"></td>
+                            <td><input type="tel" inputmode="numeric" pattern="[1-9]" maxlength="1" aria-label="Row 5 Column 6" title="Enter digits 1-9"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="tel" inputmode="numeric" maxlength="1" value="2" readonly aria-label="Row 6 Column 1 value 2"></td>
+                            <td><input type="text" inputmode="numeric" pattern="[1-9]" maxlength="1" aria-label="Row 6 Column 2" title="Enter digits 1-9"></td>
+                            <td><input type="text" inputmode="numeric" pattern="[1-9]" maxlength="1" aria-label="Row 6 Column 3" title="Enter digits 1-9"></td>
+                            <td><input type="tel" inputmode="numeric" maxlength="1" value="5" readonly aria-label="Row 6 Column 4 value 5"></td>
+                            <td><input type="text" inputmode="numeric" pattern="[1-9]" maxlength="1" aria-label="Row 6 Column 5" title="Enter digits 1-9"></td>
+                            <td><input type="tel" inputmode="numeric" maxlength="1" value="4" readonly aria-label="Row 6 Column 6 value 4"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Game Info Section -->
+            <div class="game-info-section">
+                <!-- Timer -->
+                <div class="timer-card">
+                    <div class="timer-display">
+                        <span class="timer-segment">03</span>
+                        <span class="timer-segment timer-colon">:</span>
+                        <span class="timer-segment">42</span>
+                    </div>
+                    <div class="timer-label">Time Elapsed</div>
+                </div>
+
+                <!-- Progress -->
+                <div class="progress-section">
+                    <h3 class="info-title">Progress</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <div class="progress-text">15 of 36 cells completed (42%)</div>
+                </div>
+
+                <!-- Game Info -->
+                <div class="game-info-card">
+                    <h3 class="info-title">Game Information</h3>
+                    <div class="info-item">
+                        <span class="info-label">Difficulty:</span>
+                        <span class="difficulty-indicator">Easy</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Grid Size:</span>
+                        <span class="info-value">6×6</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Given Numbers:</span>
+                        <span class="info-value">15/36</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Empty Cells:</span>
+                        <span class="info-value">21</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Author:</span>
+                        <span class="info-value">Sarah Chen</span>
+                    </div>
+                </div>
+
+                <!-- Game Controls -->
+                <div class="game-controls">
+                    <h3 class="info-title">Game Controls</h3>
+                    <div class="control-buttons">
+                        <button class="control-btn btn-success-control">Check Solution</button>
+                        <button class="control-btn btn-secondary-control">Hint</button>
+                        <button class="control-btn btn-secondary-control">Pause Game</button>
+                        <button class="control-btn btn-danger-control">Reset Puzzle</button>
+                        <a href="../selection/" class="control-btn btn-secondary-control">Back to Games</a>
+                    </div>
+                </div>
+
+                <!-- Number Pad -->
+                <div class="number-pad-6x6">
+                    <h3 class="info-title">Number Pad</h3>
+                    <div class="number-grid-6x6">
+                        <button class="number-btn-6x6" data-number="1">1</button>
+                        <button class="number-btn-6x6" data-number="2">2</button>
+                        <button class="number-btn-6x6" data-number="3">3</button>
+                        <button class="number-btn-6x6" data-number="4">4</button>
+                        <button class="number-btn-6x6" data-number="5">5</button>
+                        <button class="number-btn-6x6" data-number="6">6</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('input', function (event) {
+            const target = event.target;
+            if (target.matches('.sudoku-grid-6x6 input:not([readonly]), .sudoku-grid input:not([readonly])')) {
+                target.value = target.value.replace(/[^1-9]/g, '');
+                if (target.value.length > 1) {
+                    target.value = target.value.slice(-1);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+

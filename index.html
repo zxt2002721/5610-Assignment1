@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SudokuMaster - The Ultimate Number Puzzle Game</title>
+    <link rel="stylesheet" href="css/common.css">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.9)),
+                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            padding: 2rem;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero-inner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .hero-visual {
+            width: 320px;
+            height: 320px;
+            padding: 1.25rem;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero-visual svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 1rem;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+            letter-spacing: -2px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+
+        .hero-description {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 3rem;
+            line-height: 1.8;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .cta-btn {
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-btn-primary {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+        }
+
+        .cta-btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(255, 107, 107, 0.4);
+        }
+
+        .cta-btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .cta-btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .features-section {
+            padding: 5rem 0;
+            background-color: #f8f9fa;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 15px 15px 0 0;
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .feature-description {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .floating-numbers {
+            position: absolute;
+            font-size: 2rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.1);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .floating-numbers:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+        .floating-numbers:nth-child(2) { top: 60%; left: 15%; animation-delay: 1s; }
+        .floating-numbers:nth-child(3) { top: 30%; right: 20%; animation-delay: 2s; }
+        .floating-numbers:nth-child(4) { top: 70%; right: 10%; animation-delay: 3s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-20px) rotate(5deg); }
+            66% { transform: translateY(10px) rotate(-3deg); }
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .cta-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">🧩 SudokuMaster</a>
+        <input type="checkbox" id="navToggle" class="navbar-checkbox">
+        <label for="navToggle" class="navbar-toggle">☰</label>
+        <ul class="navbar-nav">
+            <li><a href="/" class="nav-link active">Home</a></li>
+            <li><a href="selection/" class="nav-link">Games</a></li>
+            <li><a href="rules/" class="nav-link">Rules</a></li>
+            <li><a href="highscore/" class="nav-link">High Scores</a></li>
+            <li><a href="login/" class="nav-link">Login</a></li>
+            <li><a href="register/" class="nav-link">Register</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="floating-numbers">1</div>
+        <div class="floating-numbers">5</div>
+        <div class="floating-numbers">9</div>
+        <div class="floating-numbers">3</div>
+        
+        <div class="hero-inner">
+            <div class="hero-content">
+                <h1 class="hero-title">SudokuMaster</h1>
+                <h2 class="hero-subtitle">Challenge Your Mind with Numbers</h2>
+                <p class="hero-description">
+                    Welcome to the ultimate Sudoku experience! Test your logic and problem-solving skills 
+                    with our collection of carefully crafted puzzles. From easy 6x6 grids perfect for 
+                    beginners to challenging 9x9 puzzles that will push your limits.
+                </p>
+                <div class="cta-buttons">
+                    <a href="selection/" class="cta-btn cta-btn-primary">Start Playing</a>
+                    <a href="rules/" class="cta-btn cta-btn-secondary">Learn Rules</a>
+                </div>
+            </div>
+            <div class="hero-visual" aria-hidden="true">
+                <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img">
+                    <rect x="10" y="10" width="100" height="100" rx="12" fill="#ffffff" fill-opacity="0.9"/>
+                    <line x1="10" y1="50" x2="110" y2="50" stroke="#cfd3d8" stroke-width="3"/>
+                    <line x1="10" y1="80" x2="110" y2="80" stroke="#cfd3d8" stroke-width="3"/>
+                    <line x1="50" y1="10" x2="50" y2="110" stroke="#cfd3d8" stroke-width="3"/>
+                    <line x1="80" y1="10" x2="80" y2="110" stroke="#cfd3d8" stroke-width="3"/>
+                    <text x="30" y="38" font-size="24" font-family="'Poppins', sans-serif" fill="#3b5bfd">7</text>
+                    <text x="62" y="38" font-size="24" font-family="'Poppins', sans-serif" fill="#1f2933">8</text>
+                    <text x="92" y="38" font-size="24" font-family="'Poppins', sans-serif" fill="#1f2933">4</text>
+                    <text x="30" y="70" font-size="24" font-family="'Poppins', sans-serif" fill="#1f2933">9</text>
+                    <text x="62" y="70" font-size="24" font-family="'Poppins', sans-serif" fill="#1f2933">5</text>
+                    <text x="92" y="70" font-size="24" font-family="'Poppins', sans-serif" fill="#1f2933">6</text>
+                    <text x="30" y="102" font-size="24" font-family="'Poppins', sans-serif" fill="#3b5bfd">3</text>
+                    <text x="62" y="102" font-size="24" font-family="'Poppins', sans-serif" fill="#1f2933">2</text>
+                    <text x="92" y="102" font-size="24" font-family="'Poppins', sans-serif" fill="#3b5bfd">1</text>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer with additional content -->
+    <footer style="background-color: #333; color: white; padding: 2rem 0; text-align: center;">
+        <div class="container">
+            <p>&copy; 2024 SudokuMaster. All rights reserved.</p>
+            <div style="margin-top: 1rem;">
+                <span style="color: #ccc;">Ready to challenge your mind?</span>
+                <a href="selection/" style="color: #667eea; margin-left: 1rem;">Start Your Journey →</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
